@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketFood - Ingredient Scanner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <!-- Header -->
+        <header class="bg-primary text-white py-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="mb-0"><i class="bi bi-rocket-takeoff"></i> RocketFood</h1>
+                    <button class="btn btn-outline-light" id="info-button">
+                        <i class="bi bi-info-circle"></i> About
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container my-4">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <!-- Intro Card -->
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <h2 class="card-title">Scan Food Ingredients</h2>
+                            <p class="card-text">Take a photo of an ingredients list or upload an existing image to analyze what's really in your food.</p>
+                            
+                            <!-- Input Options -->
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-primary" id="camera-button">
+                                    <i class="bi bi-camera"></i> Use Camera
+                                </button>
+                                <button class="btn btn-secondary" id="upload-button">
+                                    <i class="bi bi-upload"></i> Upload Image
+                                </button>
+                                <input type="file" id="file-input" accept="image/*" class="d-none">
+                            </div>
+                            
+                            <!-- Manual Input Option -->
+                            <div class="mb-3">
+                                <div class="form-floating">
+                                    <textarea class="form-control" id="manual-input" style="height: 100px"></textarea>
+                                    <label for="manual-input">Or type ingredients list here...</label>
+                                </div>
+                                <div class="d-grid mt-2">
+                                    <button class="btn btn-outline-primary" id="analyze-text-button">
+                                        <i class="bi bi-search"></i> Analyze Text
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Camera View (Hidden by default) -->
+                    <div class="card mb-4 shadow-sm d-none" id="camera-card">
+                        <div class="card-body">
+                            <h3 class="card-title">Take a Photo</h3>
+                            <div class="camera-container">
+                                <video id="camera-view" autoplay playsinline></video>
+                                <canvas id="camera-canvas" class="d-none"></canvas>
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-primary" id="take-photo-button">
+                                    <i class="bi bi-camera"></i> Take Photo
+                                </button>
+                                <button class="btn btn-outline-secondary" id="cancel-camera-button">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview & Results (Hidden by default) -->
+                    <div class="card mb-4 shadow-sm d-none" id="results-card">
+                        <div class="card-body">
+                            <h3 class="card-title">Analysis Results</h3>
+                            
+                            <!-- Image Preview -->
+                            <div class="text-center mb-3">
+                                <img id="preview-image" class="img-fluid rounded mb-3 d-none" alt="Ingredient list">
+                                <div id="text-preview" class="border rounded p-3 mb-3 d-none">
+                                    <h5>Analyzed Text:</h5>
+                                    <p id="text-content" class="mb-0"></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Loading Indicator -->
+                            <div id="loading-indicator" class="text-center mb-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Analyzing ingredients...</p>
+                            </div>
+                            
+                            <!-- Results Display -->
+                            <div id="results-display" class="d-none">
+                                <!-- Overall Score -->
+                                <div class="mb-4 text-center">
+                                    <h4>Overall Score</h4>
+                                    <div class="score-indicator">
+                                        <div id="score-badge" class="badge bg-success fs-5 p-2">
+                                            <i class="bi bi-check-circle"></i> GREEN - Looks Good!
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Ingredients Analysis -->
+                                <h4>Ingredients Analysis</h4>
+                                <div id="ingredients-list" class="list-group mb-3">
+                                    <!-- Ingredients will be added here dynamically -->
+                                </div>
+                                
+                                <!-- Tips Section -->
+                                <div class="mt-4">
+                                    <h4>Tips for Better Choices</h4>
+                                    <div id="tips-list">
+                                        <!-- Tips will be added here dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-primary" id="scan-again-button">
+                                    <i class="bi bi-arrow-repeat"></i> Scan Another
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Info Modal -->
+        <div class="modal fade" id="info-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">About RocketFood</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>How It Works</h5>
+                        <p>RocketFood helps you identify potentially harmful or misleading ingredients in your food products. Simply take a photo of the ingredients list or upload an existing image, and we'll analyze it for you.</p>
+                        
+                        <h5>Understanding the Scores</h5>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item list-group-item-success">
+                                <strong>GREEN</strong> - Generally recognized as safe and natural ingredients
+                            </li>
+                            <li class="list-group-item list-group-item-warning">
+                                <strong>YELLOW</strong> - Potentially concerning ingredients or misleading terms
+                            </li>
+                            <li class="list-group-item list-group-item-danger">
+                                <strong>RED</strong> - Harmful, toxic, or highly processed ingredients
+                            </li>
+                        </ul>
+                        
+                        <h5>Tips for Reading Ingredients Labels</h5>
+                        <ol>
+                            <li>Ingredients are listed in order of their proportion in the product. The first 3 ingredients matter most.</li>
+                            <li>If you can't pronounce it, be cautious. Chemical-sounding ingredients often indicate processing.</li>
+                            <li>Don't be fooled by fancy ingredients that appear far down the list - they're likely present in tiny amounts.</li>
+                            <li>Remember that chemical contaminants don't have to be listed. Choose organic when possible.</li>
+                            <li>Look for words like "sprouted" or "raw" to indicate higher-quality natural foods.</li>
+                            <li>"Wheat flour" is not the same as "whole grain wheat flour" - don't be fooled!</li>
+                            <li>Brown products aren't necessarily healthier (brown sugar, brown bread without whole grains).</li>
+                            <li>Watch out for deceptively small serving sizes that mask high calories, sugar, or fat content.</li>
+                        </ol>
+                        
+                        <h5>Common Misleading Ingredients</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <strong>"Carmine"</strong> - Actually made from crushed cochineal beetles
+                            </li>
+                            <li class="list-group-item">
+                                <strong>"Yeast Extract"</strong> - Often used to hide MSG (monosodium glutamate)
+                            </li>
+                            <li class="list-group-item">
+                                <strong>"Natural Flavors"</strong> - Can include a wide range of processed additives
+                            </li>
+                            <li class="list-group-item">
+                                <strong>"Guacamole Dip"</strong> - May contain no actual avocado, just oils and coloring
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="ingredients-database.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
